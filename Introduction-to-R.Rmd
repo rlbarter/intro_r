@@ -77,16 +77,11 @@ but the piped version is much easier to read, since you can look at it and read 
 ## Manipulating data with dplyr functions
 
 
-The functions `select()`, `mutate()`, `filter()`, `summarise()`, and `group_by()` are the workhorses behind modern data exploration and manipulation in R.
-
-To access them, you need to **load the `tidyverse` library**.
-
-```{r}
-library(tidyverse)
-```
+The tidyverse (dplyr) functions `select()`, `mutate()`, `filter()`, `summarise()`, and `group_by()` are the workhorses behind modern data exploration and manipulation in R.
 
 
-One you start using tidyverse functions, you can think of your data as the *universe**, and the columns of your data (such as `country`, `year`, and `pop`) as the *objects* that you can access within your universe. This essentially means that, within tidyverse functions, you don't need to surround the variable names in quotes.
+
+One you start using tidyverse functions, you can think of your data as the *universe*, and the columns of your data (such as `country`, `year`, and `pop`) as the *objects* that you can access within your universe. This essentially means that, within tidyverse functions, you don't need to surround the variable names in quotes.
 
 ### Select
 

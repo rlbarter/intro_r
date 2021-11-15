@@ -1,5 +1,5 @@
 ---
-title: "Introduction to R (instructor copy)"
+title: "Introduction to R"
 author: "Rebecca Barter"
 date: "11/12/2021"
 output: html_document
@@ -11,215 +11,306 @@ In this tutorial, you will learn the basics of R Markdown, data frames (tibbles)
 
 ## Data as data frames
 
-### Load data from web 
+First, let's load in the "Gapminder" data from the web:
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
+```{r}
 gapminder <- read.csv(
     "https://raw.githubusercontent.com/swcarpentry/r-novice-gapminder/gh-pages/_episodes_rmd/data/gapminder-FiveYearData.csv"
 )
 ```
 
-### Head
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-head(gapminder)
+We can look at the **first 6 rows** using the `head()` function:
+
+```{r}
+
 ```
 
-### Dimension
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-dim(gapminder)
+And the **dimension** of the dataset using `dim()`
+
+```{r}
+
 ```
+
+The data contains 6 "columns" or "variables" that we will be able to manipulate, summarize, and visualize. 
+
+
+
 
 
 ## The tidyverse
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-library(tidyverse)
+Almost everything that is useful in modern R, is contained within the `tidyverse` library, which is actually a compilation of several libraries (including `dplyr` and `ggplot2`).
+
+```{r}
+# load tidyverse library
+
 ```
+
+
+
+
+
+
+
+
 
 ## Piping
 
-### %>% "and then"
+First, the most useful tool in modern R universe is the pipe: `%>%`. You can read the pipe as "**and then**". The idea of the pipe is to take the *object* on the left-hand-side of the pipe operator and place it in the first "argument" of the *function* on the right-hand-side of the pipe operator. 
 
+This means that `object %>% function()` is equivalent to `function(object)`.
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>% head()
+For instance, we could use piping with the `head()` function as follows:
+
+```{r}
+# compute head(gapminder) using the pipe
+
 ```
 
-### Chain together functions
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>% head() %>% dim()
+The output is itself a new object, that can then be piped into a new function, allowing us to **chain** together functions.
+
+For instance:
+
+```{r}
+# compute the dimension of head(gapminder)
+
 ```
 
+is equivalent to
 
-
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
+```{r}
 dim(head(gapminder))
 ```
+
+
+but the piped version is much easier to read, since you can look at it and read *"take the `gapminder` data-frame, and then apply the `head()` function, and then apply the `dim()` function to the output"*.
+
+
+
+
+
+
+
+
+
+
 
 
 ## Manipulating data with dplyr functions
 
 
+The functions `select()`, `mutate()`, `filter()`, `summarise()`, and `group_by()` are the workhorses behind modern data exploration and manipulation in R.
 
 
-### Load the tidyverse
+One you start using tidyverse functions, you can think of your data as the *universe*, and the columns of your data (such as `country`, `year`, and `pop`) as the *objects* that you can access within your universe. This essentially means that, within tidyverse functions, you don't need to surround the variable names in quotes.
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-library(tidyverse)
-```
+
+
+
 
 ### Select
 
+`select()` lets you pull columns from the data. For instance the following code selects the `country` variable from the `gapminder` data frame, and then just prints out the first 6 rows. 
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>% 
-  select(country) %>%
-  head()
+```{r}
+# select country from gapminder and take the head
+
 ```
 
+Note that this code just prints out the results. If we wanted to *save* the results in an object, we would need to define it as an object using the "assignment" operator `<-`, e.g.,
 
-### Saving objects
+```{r}
+# define object called top_six_countries
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-top_six_countries <- gapminder %>%
-  select(country) %>%
-  head
 ```
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
+Notice how nothing was printed this time. If we want to access the results of our computation, we can write the name of the object that we defined:
+
+```{r}
 top_six_countries
 ```
+
+Note that if you start thinking in the tidyverse way, you will find that you rarely actually need to define new objects. This is what makes piping so powerful: you can print out all of your results and make all of your figures without having to keep track of several different data objects.
+
+
+
+
+
+
+
 
 
 ### Filter
 
+The `filter()` function only keeps the rows in the data that satisfy a certain condition. For instance, if you wanted to look only at the data from Australia, you can filter to rows that satisfy the condition `country == "Australia"`
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  filter(country == "Australia")
+```{r}
+# filter to Australia
+
 ```
 
-#### Multiple filters
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  filter(country == "Australia", year > 1980)
+You can also use multiple filter conditions at the same time:
+
+```{r}
+# filter to Australia and year > 1980
+
 ```
+
+
+
+
+
+
 
 
 ### Mutate
 
+The `mutate()` function lets you *add* or *modify* columns of your data. For instance, we can create a `gdp` column, by multiplying the `gdpPercap` column by the `pop` column:
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  mutate(gdp = gdpPercap * pop) %>%
-  head
+```{r}
+# mutate to create gdp and head
+
 ```
 
 
 ### Summarize
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  summarize(mean(lifeExp))
+The `summarize()` function, allows you to create a summary of any column(s) you like. For instance, to compute the *mean* life expectancy:
+
+```{r}
+# compute the mean life expectency
+
 ```
 
-#### Naming summary columns
+The output here is a single-column single-row data frame. You can also give the summary a column name by naming your summary function:
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  summarize(mean_lifeExp = mean(lifeExp))
+```{r}
+# compute mean life expectancy and name column
+
 ```
+
+This is useful if you want to use the summary column you created in a downstream analysis (e.g. a visualization).
+
+
+
+
+
+
+
 
 
 
 ### Group by
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  group_by(country) %>%
-  summarize(mean_lifeExp = mean(lifeExp)) %>%
-  ungroup()
+The last function we will introduce for manipulating your data is the `group_by()` function. This allows you to use `summarize()` or `mutate()`, etc, *separately* for different values in a categorical variable.
+
+You can think of `group_by()` as creating a separate data frame for each different level of the grouping variable, and applying whatever functions you're applying to each data frame separately, and then aggregating the results together.
+
+For instance, to compute the average `lifeExp` separately for each `country`, you can first group by country and then apply `summarize()`:
+
+```{r}
+# compute life expectancy for each country separately
+
 ```
 
 
+
+You should generally remember to `ungroup()` after you `group_by()` because otherwise any downstream functions you apply will still be grouped.
 
 
 ## Visualization with ggplot2
 
-### ggplot function
+Let's move onto some more fun stuff: making data visualizations. The primary data visualization package in R is ggplot2, which is loaded when you load the tidyverse.
+
+Every ggplot starts with the `ggplot()` function, which just initiates the ggplot object. 
 
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
+```{r}
+# use ggplot function
+gapminder %>%
+```
+
+
+
+### Geom layers
+
+To actually visualize your data, however, you need to *add* plot layers, such as a scatterplot layer using `geom_point()` or a histogram layer using `geom_histogram()`.
+
+It's a little confusing, but when you add ggplot layers, you no longer use the pipe, but you need to use `+`:
+
+```{r}
+# add a point layer and then color by continent
 gapminder %>%
   ggplot()
 ```
 
-### Geom layers
 
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE, error=TRUE}
-gapminder %>%
-  ggplot() +
-  geom_point()
-```
-
-#### Aesthetics
-
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  ggplot() +
-  geom_point(aes(x = gdpPercap, y = lifeExp))
-```
-
-#### Color
 
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  ggplot() +
-  geom_point(aes(x = gdpPercap, y = lifeExp, col = continent))
-```
+
+
+
+
+
+
+
+
 
 ### Combining data manipulations and ggplot2
 
+We can combine the stuff we learned above with our visualization. This plot is including *all* years of the data, if we want to just include the data from 2007, we could *filter* our data before plotting it:
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
+```{r}
+# filter to year 2007 and then do some plotting
 gapminder %>%
-  filter(year == 2007) %>%
-  ggplot() +
-  geom_point(aes(x = gdpPercap, y = lifeExp, col = continent))
+  
 ```
+
+
+
+
+
+
+
+
+
+
 
 
 #### Exercise: create a line plot of global average life expectency over time
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  group_by(year) %>%
-  summarise(mean_lifeExp = mean(lifeExp)) %>%
-  ungroup() %>%
-  ggplot() +
-  geom_line(aes(x = year, y = mean_lifeExp))
+```{r}
+gapminder %>% 
 ```
 
-### Other geoms: lines
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Other geoms
+
+There are many other geom layers that you could add, e.g. `geom_line()` will create a line plot:
+
+```{r}
 gapminder %>%
   ggplot() +
-  geom_line(aes(x = year, y = lifeExp, group = country, col = continent))
+  geom_line()
 ```
 
-### Multiple geoms
 
-```{r, out.height = "30%", out.width = "30%", message = FALSE, warning = FALSE}
-gapminder %>%
-  ggplot() +
-  geom_line(aes(x = year, y = lifeExp, group = country, col = continent)) +
-  geom_point(aes(x = year, y = lifeExp, col = continent))
-```
 
